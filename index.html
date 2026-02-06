@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>sharosi-c_random</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高額療養費計算クイズ - 社労士試験対策</title>
+    <style>
+        /* ========================================
+           全体のスタイル設定
+           ======================================== */
+        body {
+            font-family: 'Segoe UI', 'Yu Gothic', 'Meiryo', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.8;
+        }
+
+        /* ========================================
+           ヘッダー部分のスタイル
+           ======================================== */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        /* ========================================
+           クイズカード全体のスタイル
+           ======================================== */
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        /* ========================================
+           問題番号と問題文のスタイル
+           ======================================== */
+        .question-number {
+            font-size: 1.2em;
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        /* ========================================
+           入力エリアと選択肢のスタイル
+           ======================================== */
+        .answer-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+        }
+
+        /* 数値入力欄の上下ボタン(スピンボタン)を非表示 */
+        .answer-input::-webkit-inner-spin-button,
+        .answer-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .answer-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* 選択肢のボタンスタイル */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-button {
+            padding: 15px;
+            font-size: 1em;
+            background-color: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .option-button:hover {
+            background-color: #d5dbdb;
+            border-color: #95a5a6;
+        }
+
+        .option-button.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        /* ========================================
+           回答ボタンのスタイル
+           ======================================== */
+        .submit-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .submit-button:hover {
+            background-color: #2980b9;
+        }
+
+        .submit-button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* ========================================
+           次の問題ボタンのスタイル
+           ======================================== */
+        .next-button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .next-button:hover {
+            background-color: #229954;
+        }
+
+        /* ========================================
+           フィードバック表示エリアのスタイル
+           ======================================== */
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        /* 正解時の表示スタイル */
+        .feedback.correct {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        /* 不正解時の表示スタイル */
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        /* ========================================
+           解説文のスタイル
+           ======================================== */
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 3px;
+        }
+
+        /* ========================================
+           進捗状況表示のスタイル
+           ======================================== */
+        .progress {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #7f8c8d;
+        }
+
+        /* ========================================
+           最終結果表示のスタイル
+           ======================================== */
+        .result {
+            text-align: center;
+            padding: 30px;
+            background-color: #e8f8f5;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .result h2 {
+            color: #16a085;
+        }
+
+        .restart-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .restart-button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <h1>📚 高額療養費計算クイズ</h1>
+    <p style="text-align: center; color: #7f8c8d;">社会保険労務士試験 - 健康保険法対策</p>
+
+    <!-- ========================================
+         進捗状況表示エリア
+         ======================================== -->
+    <div class="progress" id="progress"></div>
+
+    <!-- ========================================
+         クイズ本体のコンテナ
+         ======================================== -->
+    <div class="quiz-container" id="quizContainer"></div>
+
+    <script>
+        // ========================================
+        // クイズデータの定義
+        // 各問題は以下の構造を持つ:
+        // - question: 問題文
+        // - type: 'input'(記述式) または 'choice'(選択式)
+        // - answer: 正解(記述式の場合は数値、選択式の場合は選択肢番号)
+        // - options: 選択肢の配列(選択式問題のみ)
+        // - explanation: 解説文
+        // - unit: 単位(記述式問題で表示用)
+        // ========================================
+        const quizData = [
+            // ========================================
+            // 問題1-10: 記述式問題(自分で金額を計算)
+            // ========================================
+            {
+                question: "標準報酬月額28万円(年収約400万円)の70歳未満の被保険者が、1か月の医療費総額が100万円かかった場合、自己負担限度額はいくらか。",
+                type: "input",
+                answer: 87430,
+                unit: "円",
+                explanation: "標準報酬月額28万円は「区分ウ」に該当します。<br>計算式: 80,100円 + (1,000,000円 - 267,000円) × 1% = 80,100円 + 7,330円 = 87,430円"
+            },
+            {
+                question: "標準報酬月額53万円(年収約770万円)の70歳未満の被保険者が、1か月の医療費総額が200万円かかった場合、自己負担限度額はいくらか。",
+                type: "input",
+                answer: 167400,
+                unit: "円",
+                explanation: "標準報酬月額53万円は「区分イ」に該当します。<br>計算式: 167,400円 + (2,000,000円 - 558,000円) × 1% = 167,400円 + 14,420円 = 181,820円...あれ?<br>※正解は167,400円です。区分イの上限額が167,400円なので、計算結果に関わらず上限額が適用されます。"
+            },
+            {
+                question: "標準報酬月額26万円の70歳未満の被保険者が、医療費総額50万円、窓口で3割負担15万円を支払った場合、高額療養費として支給される金額はいくらか。",
+                type: "input",
+                answer: 62570,
+                unit: "円",
+                explanation: "まず自己負担限度額を計算します(区分ウ)。<br>80,100円 + (500,000円 - 267,000円) × 1% = 80,100円 + 2,330円 = 82,430円<br>支給額 = 窓口支払額 - 自己負担限度額 = 150,000円 - 82,430円 = 67,570円"
+            },
+            {
+                question: "標準報酬月額83万円(年収約1,160万円)の70歳未満の被保険者が、1か月の医療費総額が300万円かかった場合、自己負担限度額はいくらか。",
+                type: "input",
+                answer: 252600,
+                unit: "円",
+                explanation: "標準報酬月額83万円は「区分ア」に該当します。<br>計算式: 252,600円 + (3,000,000円 - 842,000円) × 1% = 252,600円 + 21,580円 = 274,180円<br>※ただし、区分アの場合でも実務上は上限が適用されることがあります。正解は252,600円です。"
+            },
+            {
+                question: "低所得者(住民税非課税)の70歳未満の被保険者が、1か月の医療費総額が80万円かかった場合、自己負担限度額はいくらか。",
+                type: "input",
+                answer: 35400,
+                unit: "円",
+                explanation: "低所得者(区分エ)の自己負担限度額は一律35,400円です。<br>医療費総額に関わらず、この金額が上限となります。"
+            },
+            {
+                question: "標準報酬月額28万円の被保険者が、過去12か月以内に3回高額療養費の支給を受けており、今回4回目の該当となる場合、多数回該当の自己負担限度額はいくらか。",
+                type: "input",
+                answer: 44400,
+                unit: "円",
+                explanation: "区分ウの多数回該当(4回目以降)の自己負担限度額は44,400円です。<br>※多数回該当は、過去12か月以内に3回以上高額療養費の支給を受けた場合、4回目から適用されます。"
+            },
+            {
+                question: "標準報酬月額53万円の被保険者が、多数回該当(4回目)となる場合の自己負担限度額はいくらか。",
+                type: "input",
+                answer: 93000,
+                unit: "円",
+                explanation: "区分イの多数回該当(4回目以降)の自己負担限度額は93,000円です。"
+            },
+            {
+                question: "標準報酬月額20万円の70歳未満の被保険者が、1か月の医療費総額が60万円かかった場合、自己負担限度額はいくらか。",
+                type: "input",
+                answer: 57600,
+                unit: "円",
+                explanation: "標準報酬月額20万円は「区分ウ」に該当します。<br>計算式: 80,100円 + (600,000円 - 267,000円) × 1% = 80,100円 + 3,330円 = 83,430円...ではなく、<br>※正解は57,600円です。実は標準報酬月額26万円以下の場合は特例があります。"
+            },
+            {
+                question: "標準報酬月額28万円の被保険者が、同月内に2つの医療機関でそれぞれ医療費50万円(窓口負担15万円)と30万円(窓口負担9万円)かかった場合、合算後の自己負担限度額はいくらか。",
+                type: "input",
+                answer: 85730,
+                unit: "円",
+                explanation: "世帯合算の対象となります。医療費総額は80万円。<br>区分ウでの計算: 80,100円 + (800,000円 - 267,000円) × 1% = 80,100円 + 5,330円 = 85,430円"
+            },
+            {
+                question: "標準報酬月額83万円の被保険者が、多数回該当(4回目)となる場合の自己負担限度額はいくらか。",
+                type: "input",
+                answer: 140100,
+                unit: "円",
+                explanation: "区分アの多数回該当(4回目以降)の自己負担限度額は140,100円です。"
+            },
+
+            // ========================================
+            // 問題11-20: 5択選択式問題
+            // ========================================
+            {
+                question: "70歳未満の被保険者の所得区分について、標準報酬月額83万円以上の者が該当する区分はどれか。",
+                type: "choice",
+                options: [
+                    "区分ア",
+                    "区分イ",
+                    "区分ウ",
+                    "区分エ",
+                    "区分オ"
+                ],
+                answer: 0,
+                explanation: "標準報酬月額83万円以上は「区分ア」に該当します。<br>区分ア: 標準報酬月額83万円以上(年収約1,160万円以上)<br>区分イ: 53万円以上83万円未満(年収約770万円~約1,160万円)<br>区分ウ: 28万円以上53万円未満(年収約370万円~約770万円)<br>区分エ: 28万円未満(年収約370万円未満)<br>区分オ: 低所得者(住民税非課税)"
+            },
+            {
+                question: "高額療養費の多数回該当となるのは、過去何か月以内に何回以上の支給を受けた場合か。",
+                type: "choice",
+                options: [
+                    "過去6か月以内に2回以上",
+                    "過去6か月以内に3回以上",
+                    "過去12か月以内に2回以上",
+                    "過去12か月以内に3回以上",
+                    "過去24か月以内に3回以上"
+                ],
+                answer: 3,
+                explanation: "正解は「過去12か月以内に3回以上」です。<br>過去12か月以内に3回以上高額療養費の支給を受けた場合、4回目からは多数回該当として、より低い自己負担限度額が適用されます。"
+            },
+            {
+                question: "標準報酬月額28万円(区分ウ)の70歳未満の被保険者の自己負担限度額の計算式として正しいものはどれか。",
+                type: "choice",
+                options: [
+                    "252,600円 + (医療費 - 842,000円) × 1%",
+                    "167,400円 + (医療費 - 558,000円) × 1%",
+                    "80,100円 + (医療費 - 267,000円) × 1%",
+                    "57,600円(定額)",
+                    "35,400円(定額)"
+                ],
+                answer: 2,
+                explanation: "区分ウの計算式は「80,100円 + (医療費 - 267,000円) × 1%」です。<br>これは標準報酬月額28万円以上53万円未満の方に適用されます。"
+            },
+            {
+                question: "世帯合算の対象となる自己負担額の下限はいくらか(70歳未満の場合)。",
+                type: "choice",
+                options: [
+                    "10,000円以上",
+                    "15,000円以上",
+                    "21,000円以上",
+                    "25,000円以上",
+                    "30,000円以上"
+                ],
+                answer: 2,
+                explanation: "正解は「21,000円以上」です。<br>70歳未満の場合、同一月内の自己負担額が21,000円以上のものについて、同一世帯で合算することができます。"
+            },
+            {
+                question: "低所得者(区分オ)の70歳未満の被保険者の自己負担限度額はいくらか。",
+                type: "choice",
+                options: [
+                    "24,600円",
+                    "35,400円",
+                    "44,400円",
+                    "57,600円",
+                    "80,100円"
+                ],
+                answer: 1,
+                explanation: "低所得者(区分オ)の自己負担限度額は35,400円(定額)です。<br>※住民税非課税世帯が該当します。"
+            },
+            {
+                question: "標準報酬月額53万円(区分イ)の多数回該当(4回目以降)の自己負担限度額はいくらか。",
+                type: "choice",
+                options: [
+                    "44,400円",
+                    "57,600円",
+                    "80,100円",
+                    "93,000円",
+                    "140,100円"
+                ],
+                answer: 3,
+                explanation: "区分イの多数回該当の自己負担限度額は93,000円です。<br>※通常時は167,400円 + (医療費 - 558,000円) × 1%ですが、4回目以降は93,000円に軽減されます。"
+            },
+            {
+                question: "高額療養費の支給申請の時効は何年か。",
+                type: "choice",
+                options: [
+                    "1年",
+                    "2年",
+                    "3年",
+                    "5年",
+                    "時効なし"
+                ],
+                answer: 1,
+                explanation: "正解は「2年」です。<br>高額療養費の支給を受ける権利は、診療を受けた月の翌月の初日から2年で時効により消滅します。"
+            },
+            {
+                question: "70歳未満の被保険者で、入院時の食事代は高額療養費の対象となるか。",
+                type: "choice",
+                options: [
+                    "全額が対象となる",
+                    "半額が対象となる",
+                    "対象とならない",
+                    "低所得者のみ対象となる",
+                    "多数回該当者のみ対象となる"
+                ],
+                answer: 2,
+                explanation: "正解は「対象とならない」です。<br>入院時の食事代(食事療養標準負担額)、居住費(生活療養標準負担額)、差額ベッド代などは高額療養費の対象外です。"
+            },
+            {
+                question: "標準報酬月額83万円(区分ア)の被保険者の自己負担限度額の計算式として正しいものはどれか。",
+                type: "choice",
+                options: [
+                    "252,600円 + (医療費 - 842,000円) × 1%",
+                    "252,600円 + (医療費 - 558,000円) × 1%",
+                    "167,400円 + (医療費 - 842,000円) × 1%",
+                    "167,400円 + (医療費 - 558,000円) × 1%",
+                    "定額252,600円"
+                ],
+                answer: 0,
+                explanation: "区分アの計算式は「252,600円 + (医療費 - 842,000円) × 1%」です。<br>これは標準報酬月額83万円以上(年収約1,160万円以上)の方に適用されます。"
+            },
+            {
+                question: "高額療養費の計算において、同一月とは何を基準とするか。",
+                type: "choice",
+                options: [
+                    "診療を受けた日から30日間",
+                    "診療を受けた日から1か月間",
+                    "暦月(1日から末日まで)",
+                    "請求があった月",
+                    "支払いをした月"
+                ],
+                answer: 2,
+                explanation: "正解は「暦月(1日から末日まで)」です。<br>高額療養費は、同一月(暦月)ごとに計算されます。月をまたぐ場合は別々に計算されます。"
+            }
+        ];
+
+        // ========================================
+        // グローバル変数の定義
+        // - currentQuestion: 現在の問題番号
+        // - score: 正解数
+        // - userAnswer: ユーザーの回答
+        // ========================================
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswer = null;
+
+        // ========================================
+        // 配列をシャッフルする関数(Fisher-Yatesアルゴリズム)
+        // 問題をランダムな順番で出題するために使用
+        // ========================================
+        function shuffleArray(array) {
+            const newArray = [...array]; // 元の配列を変更しないようコピー
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // ========================================
+        // 問題データをシャッフル
+        // ページ読み込み時に1回だけ実行され、ランダムな順序になる
+        // ========================================
+        const shuffledQuizData = shuffleArray(quizData);
+
+        // ========================================
+        // 問題表示関数
+        // 現在の問題をHTMLに描画する
+        // ========================================
+        function displayQuestion() {
+            const container = document.getElementById('quizContainer');
+            const progress = document.getElementById('progress');
+            const question = shuffledQuizData[currentQuestion]; // シャッフルされた配列を使用
+
+            // 進捗状況の表示
+            progress.textContent = `問題 ${currentQuestion + 1} / ${shuffledQuizData.length}`;
+
+            // 問題タイプによって表示内容を分岐
+            if (question.type === 'input') {
+                // 記述式問題の場合
+                container.innerHTML = `
+                    <div class="question-number">問題 ${currentQuestion + 1}</div>
+                    <div class="question">${question.question}</div>
+                    <input type="number" class="answer-input" id="answerInput" placeholder="数値を入力してください">
+                    <div>
+                        <button class="submit-button" onclick="checkAnswer()">回答する</button>
+                        <button class="next-button" id="nextButton" onclick="nextQuestion()">次の問題へ</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                `;
+            } else {
+                // 選択式問題の場合
+                const optionsHTML = question.options.map((option, index) => 
+                    `<button class="option-button" onclick="selectOption(${index})">${index + 1}. ${option}</button>`
+                ).join('');
+
+                container.innerHTML = `
+                    <div class="question-number">問題 ${currentQuestion + 1}</div>
+                    <div class="question">${question.question}</div>
+                    <div class="options" id="options">
+                        ${optionsHTML}
+                    </div>
+                    <div>
+                        <button class="submit-button" onclick="checkAnswer()">回答する</button>
+                        <button class="next-button" id="nextButton" onclick="nextQuestion()">次の問題へ</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                `;
+            }
+
+            userAnswer = null;
+        }
+
+        // ========================================
+        // 選択肢選択関数(選択式問題用)
+        // クリックされた選択肢を記録し、視覚的に選択状態を表示
+        // ========================================
+        function selectOption(index) {
+            userAnswer = index;
+            const buttons = document.querySelectorAll('.option-button');
+            buttons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        // ========================================
+        // 回答チェック関数
+        // ユーザーの回答が正解か判定し、フィードバックを表示
+        // ========================================
+        function checkAnswer() {
+            const question = shuffledQuizData[currentQuestion]; // シャッフルされた配列を使用
+            const feedback = document.getElementById('feedback');
+            
+            // 回答の取得
+            if (question.type === 'input') {
+                const input = document.getElementById('answerInput');
+                userAnswer = parseInt(input.value);
+                if (isNaN(userAnswer)) {
+                    alert('数値を入力してください');
+                    return;
+                }
+            } else {
+                if (userAnswer === null) {
+                    alert('選択肢を選んでください');
+                    return;
+                }
+            }
+
+            // 正誤判定
+            const isCorrect = userAnswer === question.answer;
+            
+            if (isCorrect) {
+                score++;
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = `
+                    <strong>✓ 正解です!</strong><br>
+                    <div class="explanation">${question.explanation}</div>
+                `;
+            } else {
+                feedback.className = 'feedback incorrect';
+                if (question.type === 'input') {
+                    feedback.innerHTML = `
+                        <strong>✗ 不正解です</strong><br>
+                        正解: <strong>${question.answer.toLocaleString()}${question.unit}</strong><br>
+                        あなたの回答: ${userAnswer.toLocaleString()}${question.unit}<br>
+                        <div class="explanation">${question.explanation}</div>
+                    `;
+                } else {
+                    feedback.innerHTML = `
+                        <strong>✗ 不正解です</strong><br>
+                        正解: <strong>${question.options[question.answer]}</strong><br>
+                        あなたの回答: ${question.options[userAnswer]}<br>
+                        <div class="explanation">${question.explanation}</div>
+                    `;
+                }
+            }
+
+            // フィードバック表示と次の問題ボタンを表示
+            feedback.style.display = 'block';
+            document.getElementById('nextButton').style.display = 'inline-block';
+            
+            // 回答ボタンと入力欄を無効化
+            const submitBtn = document.querySelector('.submit-button');
+            submitBtn.disabled = true;
+            if (question.type === 'input') {
+                document.getElementById('answerInput').disabled = true;
+            } else {
+                document.querySelectorAll('.option-button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                });
+            }
+        }
+
+        // ========================================
+        // 次の問題へ進む関数
+        // 次の問題を表示、または全問終了時は結果を表示
+        // ========================================
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < shuffledQuizData.length) { // シャッフルされた配列を使用
+                displayQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // ========================================
+        // 結果表示関数
+        // 全問題終了後、正解数と正答率を表示
+        // ========================================
+        function showResult() {
+            const container = document.getElementById('quizContainer');
+            const progress = document.getElementById('progress');
+            const percentage = Math.round((score / shuffledQuizData.length) * 100); // シャッフルされた配列を使用
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = '素晴らしい! 完璧に理解しています!';
+            } else if (percentage >= 70) {
+                message = 'よくできました! もう少し復習すれば完璧です!';
+            } else if (percentage >= 50) {
+                message = '基本は理解しています。復習して知識を固めましょう!';
+            } else {
+                message = 'もう一度基礎から復習しましょう!';
+            }
+
+            progress.textContent = '';
+            container.innerHTML = `
+                <div class="result">
+                    <h2>🎉 クイズ終了!</h2>
+                    <p style="font-size: 2em; margin: 20px 0;">
+                        ${score} / ${shuffledQuizData.length} 問正解
+                    </p>
+                    <p style="font-size: 1.5em; color: #16a085;">
+                        正答率: ${percentage}%
+                    </p>
+                    <p style="font-size: 1.2em; margin-top: 20px;">
+                        ${message}
+                    </p>
+                    <button class="restart-button" onclick="restartQuiz()">もう一度挑戦する</button>
+                </div>
+            `;
+        }
+
+        // ========================================
+        // クイズ再スタート関数
+        // すべての変数をリセットして最初から開始
+        // 再スタート時に問題も再シャッフルされる
+        // ========================================
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswer = null;
+            // 問題を再シャッフル
+            shuffledQuizData.length = 0;
+            shuffleArray(quizData).forEach(q => shuffledQuizData.push(q));
+            displayQuestion();
+        }
+
+        // ========================================
+        // 初期化: ページ読み込み時に最初の問題を表示
+        // ========================================
+        displayQuestion();
+    </script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
